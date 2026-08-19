@@ -2,6 +2,14 @@
 
 Grid component cho Angular — standalone, không dependency Kendo UI (chỉ dùng theme class names + `@progress/kendo-svg-icons` cho icons). Implement theo contract `kendo-grid` (Kendo UI for Angular) nên có thể thay thế trực tiếp.
 
+## Demo online
+
+👉 **https://hieu1012.github.io/Grid-Custom-Smart/** — 23 sections showcase từng tính năng (sort, group, filter, selection, row edit, locked, span column, footer aggregates, column chooser...), mỗi section có event log hiển thị output thật.
+
+## Hướng dẫn chi tiết
+
+📖 **[docs/USAGE.md](docs/USAGE.md)** — cài đặt, cách dùng từng loại cột, templates, inputs/events, tính năng nâng cao (server-driven, state persistence, aggregates, responsive) và cách customize grid (CSS variables, rowClass, ví dụ hoàn chỉnh).
+
 ## Cài đặt
 
 Từ GitHub (dùng cho Angular 20 / 21 / 22 — npm tự build lib khi cài):
@@ -62,9 +70,11 @@ export class ProductsComponent {
 - Grid footer aggregates (`[aggregates]` + `kendoGridFooterTemplate`)
 - Responsive: ẩn/hiện cột theo media query (`[media]` trên column)
 
-## Demo
+## Demo local
 
 ```bash
+git clone https://github.com/hieu1012/Grid-Custom-Smart.git
+cd Grid-Custom-Smart
 npm i
 npx ng serve demo
 # mở http://localhost:4200 — showcase 23 sections
