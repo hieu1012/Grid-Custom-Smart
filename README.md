@@ -7,7 +7,7 @@ Grid component cho Angular — standalone, không dependency Kendo UI (chỉ dù
 Từ GitHub (dùng cho Angular 20 / 21 / 22):
 
 ```bash
-npm i github:<your-github-user>/emi-grid#path:dist/emi-grid
+npm i https://github.com/hieu1012/Grid-Custom-Smart#path:dist/emi-grid
 ```
 
 Ngoài ra cần `@progress/kendo-svg-icons` (peer dependency — npm tự cài khi cần):
