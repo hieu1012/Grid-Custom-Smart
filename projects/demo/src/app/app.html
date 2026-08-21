@@ -1,654 +1,360 @@
-<button class="hamburger" (click)="toggleSidebar()" [class.open]="showSidebar()">☰</button>
-
-@if (showSidebar()) {
-    <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+<button class="hamburger" (click)="toggleMobileSidebar()">☰</button>
+@if (showMobileSidebar()) {
+    <div class="sidebar-overlay" (click)="toggleMobileSidebar()"></div>
 }
 
-<aside class="sidebar" [class.open]="showSidebar()">
-    <h3>smart-grid</h3>
+<aside class="sidebar" [class.open]="showMobileSidebar()">
+    <div class="sidebar-brand">
+        <span class="brand-icon">⊞</span>
+        <span class="brand-text">smart-grid</span>
+    </div>
     <nav>
         @for (title of sectionTitles; track $index; let i = $index) {
-            <a (click)="setSection(i + 1)" [class.active]="isExpanded(i + 1)">
-                <span class="nav-num">{{ i + 1 }}.</span> {{ title }}
+            <a class="nav-item" [class.active]="activeSection() === i + 1"
+               (click)="selectSection(i + 1)">
+                <span class="nav-num">{{ i + 1 }}</span>
+                <span class="nav-label">{{ title }}</span>
             </a>
         }
     </nav>
 </aside>
 
 <main class="main-content">
-    <h1>smart-grid demo</h1>
-    <p class="subtitle">23 sections showcase từng tính năng — click sidebar để navigate, "Show Code" để xem template.</p>
-
-    <!-- 1 -->
-    <section class="section" id="section-1">
-        <div class="section-header" (click)="toggleSection(1)">
-            <h2>1. Grid cơ bản — sort + pager + height cố định</h2>
-            <span class="chevron" [class.open]="isExpanded(1)">▼</span>
+    <header class="content-header">
+        <h1>{{ activeSection() }}. {{ sectionTitles[activeSection() - 1] }}</h1>
+        <p class="section-desc">{{ sectionDescriptions[activeSection()] }}</p>
+        <div class="tabs">
+            <button class="tab" [class.active]="activeTab() === 'demo'" (click)="switchTab('demo')">
+                <span class="tab-icon">▶</span> Demo
+            </button>
+            <button class="tab" [class.active]="activeTab() === 'code'" (click)="switchTab('code')">
+                <span class="tab-icon">&lt;/&gt;</span> Code
+            </button>
         </div>
-        @if (isExpanded(1)) {
-            <div class="section-body">
-                <p class="section-desc">Click header để sort (asc → desc → unsort). Pager có first/prev/next/last + số trang + info. Chiều cao cố định 300px, scroll khi vượt quá.</p>
-                <smart-grid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300" (sortChange)="onEvent('sortChange', $event)" (pageChange)="onEvent('pageChange', $event)" (dataStateChange)="onEvent('dataStateChange', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(1)">{{ isCodeVisible(1) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(1)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[1]"></code></pre>
-                }
-            </div>
-        }
-    </section>
+    </header>
 
-    <!-- 2 -->
-    <section class="section" id="section-2">
-        <div class="section-header" (click)="toggleSection(2)">
-            <h2>2. Custom templates — cell + header</h2>
-            <span class="chevron" [class.open]="isExpanded(2)">▼</span>
-        </div>
-        @if (isExpanded(2)) {
-            <div class="section-body">
-                <p class="section-desc">Header template (màu xanh), cell template (in đậm + badge, format số, text theo điều kiện).</p>
-                <smart-grid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260">
-                        <ng-template smartGridHeaderTemplate let-column>
-                            <span class="header-custom">{{ column.title }}</span>
-                        </ng-template>
-                        <ng-template smartGridCellTemplate let-dataItem>
-                            <strong>{{ dataItem.ProductName }}</strong>
-                            @if (dataItem.Discontinued) { <span class="badge">ngừng</span> }
-                        </ng-template>
-                    </smart-grid-column>
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" [style]="{ 'text-align': 'right' }">
-                        <ng-template smartGridCellTemplate let-dataItem>
-                            {{ dataItem.UnitPrice | number: '1.2-2' }} ₫
-                        </ng-template>
-                    </smart-grid-column>
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110">
-                        <ng-template smartGridCellTemplate let-dataItem>
-                            {{ dataItem.Discontinued ? 'Ngừng bán' : 'Đang bán' }}
-                        </ng-template>
-                    </smart-grid-column>
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(2)">{{ isCodeVisible(2) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(2)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[2]"></code></pre>
-                }
-            </div>
-        }
-    </section>
+    <div class="content-body">
+        @if (activeTab() === 'demo') {
+            <div class="demo-panel">
 
-    <!-- 3 -->
-    <section class="section" id="section-3">
-        <div class="section-header" (click)="toggleSection(3)">
-            <h2>3. No-records template</h2>
-            <span class="chevron" [class.open]="isExpanded(3)">▼</span>
-        </div>
-        @if (isExpanded(3)) {
-            <div class="section-body">
-                <p class="section-desc">Khi data rỗng hiển thị template tự định nghĩa thay vì text mặc định.</p>
-                <div class="toolbar">
-                    <button type="button" class="btn" (click)="toggleEmpty()">{{ emptyData().length === 0 ? 'Hiện dữ liệu' : 'Làm rỗng data' }}</button>
-                </div>
-                <smart-grid [data]="emptyData()" [height]="220">
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <ng-template smartGridNoRecordsTemplate>
-                        <div class="empty-box">Không có dữ liệu nào — đây là no-records template tùy chỉnh.</div>
-                    </ng-template>
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(3)">{{ isCodeVisible(3) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(3)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[3]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 4 -->
-    <section class="section" id="section-4">
-        <div class="section-header" (click)="toggleSection(4)">
-            <h2>4. rowClass + rowSelected — highlight theo điều kiện</h2>
-            <span class="chevron" [class.open]="isExpanded(4)">▼</span>
-        </div>
-        @if (isExpanded(4)) {
-            <div class="section-body">
-                <p class="section-desc">rowClass: hàng ngừng bán mờ đi (class <code>row-discontinued</code>). rowSelected: bật highlight nền theo function điều kiện.</p>
-                <div class="toolbar">
-                    <button type="button" class="btn" (click)="toggleHighlight()">{{ highlightDiscontinued() ? 'Tắt highlight' : 'Highlight hàng ngừng bán' }}</button>
-                </div>
-                <smart-grid [data]="products()" [height]="300" [rowClass]="rowClassFn" [rowSelected]="selectedFn()">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(4)">{{ isCodeVisible(4) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(4)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[4]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 5 -->
-    <section class="section" id="section-5">
-        <div class="section-header" (click)="toggleSection(5)">
-            <h2>5. Loading mask + hideHeader</h2>
-            <span class="chevron" [class.open]="isExpanded(5)">▼</span>
-        </div>
-        @if (isExpanded(5)) {
-            <div class="section-body">
-                <p class="section-desc">Loading: overlay spinner khi <code>[loading]="true"</code>. hideHeader: ẩn/hiện thead.</p>
-                <div class="toolbar">
-                    <button type="button" class="btn" (click)="toggleLoading()">{{ loading() ? 'Tắt loading' : 'Bật loading' }}</button>
-                    <button type="button" class="btn" (click)="toggleHeader()">{{ hideHeader() ? 'Hiện header' : 'Ẩn header' }}</button>
-                </div>
-                <smart-grid [data]="products()" [height]="300" [loading]="loading()" [hideHeader]="hideHeader()">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(5)">{{ isCodeVisible(5) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(5)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[5]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 6 -->
-    <section class="section" id="section-6">
-        <div class="section-header" (click)="toggleSection(6)">
-            <h2>6. Master detail</h2>
-            <span class="chevron" [class.open]="isExpanded(6)">▼</span>
-        </div>
-        @if (isExpanded(6)) {
-            <div class="section-body">
-                <p class="section-desc">Click nút mũi tên đầu mỗi hàng để mở detail row chứa template tùy chỉnh. <code>detailExpandBy</code> = ProductID nên trạng thái expand giữ nguyên khi đổi trang / sort.</p>
-                <smart-grid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="340" [detailExpandBy]="'ProductID'" (detailExpand)="onEvent('detailExpand', $event)" (detailCollapse)="onEvent('detailCollapse', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                    <ng-template smartGridDetailTemplate let-dataItem>
-                        <div class="detail-box">
-                            <strong>{{ dataItem.ProductName }}</strong>
-                            <ul>
-                                <li>Product ID: {{ dataItem.ProductID }}</li>
-                                <li>Danh mục: {{ dataItem.Category.Name }}</li>
-                                <li>Đơn giá: {{ dataItem.UnitPrice | number: '1.2-2' }} ₫</li>
-                                <li>Trạng thái: {{ dataItem.Discontinued ? 'Ngừng bán' : 'Đang bán' }}</li>
-                            </ul>
-                        </div>
-                    </ng-template>
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(6)">{{ isCodeVisible(6) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(6)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[6]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 7 -->
-    <section class="section" id="section-7">
-        <div class="section-header" (click)="toggleSection(7)">
-            <h2>7. Grouping — group theo cột</h2>
-            <span class="chevron" [class.open]="isExpanded(7)">▼</span>
-        </div>
-        @if (isExpanded(7)) {
-            <div class="section-body">
-                <p class="section-desc">Bật <code>[groupable]</code> → mỗi header có nút group. Click nút để group theo cột đó. Group collapse/expand phát <code>groupExpand</code>/<code>groupCollapse</code>; aggregates (sum/count) hiển thị ở group footer.</p>
-                <div class="toolbar">
-                    <button type="button" class="btn" (click)="toggleGroupByCategory()">{{ groups().length ? 'Ungroup Category' : 'Group theo Category (+ aggregates)' }}</button>
-                </div>
-                <smart-grid [data]="products()" [groupable]="true" [group]="groups()" (groupChange)="groupChangeHandler($event)" (groupExpand)="onEvent('groupExpand', $event)" (groupCollapse)="onEvent('groupCollapse', $event)" [height]="320">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(7)">{{ isCodeVisible(7) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(7)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[7]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 8 -->
-    <section class="section" id="section-8">
-        <div class="section-header" (click)="toggleSection(8)">
-            <h2>8. Filter row — lọc theo cột</h2>
-            <span class="chevron" [class.open]="isExpanded(8)">▼</span>
-        </div>
-        @if (isExpanded(8)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[filterable]="'row'"</code> → input dưới mỗi header. Mỗi lần lọc phát <code>filterChange</code> + <code>dataStateChange</code>.</p>
-                <smart-grid [data]="products()" [filterable]="'row'" [pageable]="true" [pageSize]="5" [height]="320" (filterChange)="onEvent('filterChange', $event)" (dataStateChange)="onEvent('dataStateChange', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(8)">{{ isCodeVisible(8) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(8)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[8]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 9 -->
-    <section class="section" id="section-9">
-        <div class="section-header" (click)="toggleSection(9)">
-            <h2>9. Selection — checkbox chọn dòng</h2>
-            <span class="chevron" [class.open]="isExpanded(9)">▼</span>
-        </div>
-        @if (isExpanded(9)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[selectable]="true"</code> → cột checkbox: header chọn tất cả trang hiện tại, row chọn từng dòng.</p>
-                <div class="toolbar">
-                    <span class="section-desc">Đã chọn: <strong>{{ guardedUnits() }}</strong> dòng</span>
-                </div>
-                <smart-grid [data]="products()" [selectable]="true" [pageable]="true" [pageSize]="5" [height]="320" (selectionChange)="onSelectionChange($event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(9)">{{ isCodeVisible(9) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(9)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[9]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 10 -->
-    <section class="section" id="section-10">
-        <div class="section-header" (click)="toggleSection(10)">
-            <h2>10. Resizable — kéo mép cột</h2>
-            <span class="chevron" [class.open]="isExpanded(10)">▼</span>
-        </div>
-        @if (isExpanded(10)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[resizable]="true"</code> → kéo handle ở mép phải header để đổi width cột.</p>
-                <smart-grid [data]="products()" [resizable]="true" [height]="320">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(10)">{{ isCodeVisible(10) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(10)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[10]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 11 -->
-    <section class="section" id="section-11">
-        <div class="section-header" (click)="toggleSection(11)">
-            <h2>11. Column menu — sort + ẩn/hiện cột</h2>
-            <span class="chevron" [class.open]="isExpanded(11)">▼</span>
-        </div>
-        @if (isExpanded(11)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[columnMenu]="true"</code> → nút ⋮ trên mỗi header mở menu: sort asc/desc + list cột check/uncheck để ẩn/hiện.</p>
-                <smart-grid [data]="products()" [columnMenu]="true" [sortable]="true" [height]="320" (sortChange)="onEvent('sortChange', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(11)">{{ isCodeVisible(11) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(11)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[11]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 12 -->
-    <section class="section" id="section-12">
-        <div class="section-header" (click)="toggleSection(12)">
-            <h2>12. Inline editing — double-click cell</h2>
-            <span class="chevron" [class.open]="isExpanded(12)">▼</span>
-        </div>
-        @if (isExpanded(12)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[editable]="true"</code> → dblclick vào cell để sửa. Enter/blur lưu, Esc hủy.</p>
-                <smart-grid [data]="products()" [editable]="true" [pageable]="true" [pageSize]="5" [height]="320" (cellChange)="onEvent('cellChange', $event)" (cellClose)="onEvent('cellClose', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(12)">{{ isCodeVisible(12) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(12)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[12]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 13 -->
-    <section class="section" id="section-13">
-        <div class="section-header" (click)="toggleSection(13)">
-            <h2>13. Server-driven data binding</h2>
-            <span class="chevron" [class.open]="isExpanded(13)">▼</span>
-        </div>
-        @if (isExpanded(13)) {
-            <div class="section-body">
-                <p class="section-desc">Gắn <code>[smartGridDataBinding]="fetchProducts"</code> → grid tự gọi hàm fetch mỗi khi state thay đổi. Hàm trả về <code>Promise&lt;GridDataResult&gt;</code> giả lập server (delay 400ms + loading mask).</p>
-                <smart-grid [smartGridDataBinding]="fetchProducts" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="320" [loading]="serverLoading()">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(13)">{{ isCodeVisible(13) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(13)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[13]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 14 -->
-    <section class="section" id="section-14">
-        <div class="section-header" (click)="toggleSection(14)">
-            <h2>14. State persistence — getGridState + setGridState</h2>
-            <span class="chevron" [class.open]="isExpanded(14)">▼</span>
-        </div>
-        @if (isExpanded(14)) {
-            <div class="section-body">
-                <p class="section-desc">Dùng template ref <code>#persistGrid</code> + <code>getGridState()</code>/<code>setGridState()</code> để lưu/khôi phục toàn bộ state.</p>
-                <div class="toolbar">
-                    <button type="button" class="btn" (click)="saveGridState()">Lưu state</button>
-                    <button type="button" class="btn" (click)="restoreGridState()">Khôi phục state</button>
-                </div>
-                <smart-grid #persistGrid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="320" (stateChange)="onEvent('stateChange', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(14)">{{ isCodeVisible(14) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(14)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[14]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 15 -->
-    <section class="section" id="section-15">
-        <div class="section-header" (click)="toggleSection(15)">
-            <h2>15. autoGenerateColumns — tự sinh cột theo data</h2>
-            <span class="chevron" [class.open]="isExpanded(15)">▼</span>
-        </div>
-        @if (isExpanded(15)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[autoGenerateColumns]="true"</code> + không khai báo cột → grid tự tạo cột theo fields của object đầu tiên.</p>
-                <smart-grid [data]="products()" [autoGenerateColumns]="true" [sortable]="true" [height]="320"></smart-grid>
-                <button class="code-toggle" (click)="toggleCode(15)">{{ isCodeVisible(15) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(15)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[15]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 16 -->
-    <section class="section" id="section-16">
-        <div class="section-header" (click)="toggleSection(16)">
-            <h2>16. Column group — header nhiều tầng</h2>
-            <span class="chevron" [class.open]="isExpanded(16)">▼</span>
-        </div>
-        @if (isExpanded(16)) {
-            <div class="section-body">
-                <p class="section-desc"><code>smart-grid-column-group</code> bọc các cột con để header lồng nhau (rowspan/colspan tự tính).</p>
-                <smart-grid [data]="products()" [height]="320">
-                    <smart-grid-column-group title="Thông tin chung">
+                @if (activeSection() === 1) {
+                    <smart-grid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300" (sortChange)="onEvent('sortChange', $event)" (pageChange)="onEvent('pageChange', $event)" (dataStateChange)="onEvent('dataStateChange', $event)">
                         <smart-grid-column field="ProductID" title="ID" width="70" />
                         <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    </smart-grid-column-group>
-                    <smart-grid-column-group title="Kinh doanh">
-                        <smart-grid-column-group title="Giá">
-                            <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                        </smart-grid-column-group>
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
                         <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
                         <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                    </smart-grid-column-group>
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(16)">{{ isCodeVisible(16) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(16)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[16]"></code></pre>
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
                 }
-            </div>
-        }
-    </section>
 
-    <!-- 17 -->
-    <section class="section" id="section-17">
-        <div class="section-header" (click)="toggleSection(17)">
-            <h2>17. Locked columns — cột cố định khi cuộn ngang</h2>
-            <span class="chevron" [class.open]="isExpanded(17)">▼</span>
-        </div>
-        @if (isExpanded(17)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[locked]="true"</code> → cột dính bên trái (sticky) khi table cuộn ngang. Kéo scroll ngang để thấy hiệu ứng.</p>
-                <smart-grid [data]="products()" [height]="320">
-                    <smart-grid-column field="ProductID" title="ID" width="80" [locked]="true" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="280" [locked]="true" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="180" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="220" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="160" />
-                    <smart-grid-column field="ProductID" title="ID lặp" width="180" />
-                    <smart-grid-column field="UnitPrice" title="Giá lặp" width="180" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(17)">{{ isCodeVisible(17) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(17)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[17]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 18 -->
-    <section class="section" id="section-18">
-        <div class="section-header" (click)="toggleSection(18)">
-            <h2>18. Column reorder — kéo thả header đổi thứ tự cột</h2>
-            <span class="chevron" [class.open]="isExpanded(18)">▼</span>
-        </div>
-        @if (isExpanded(18)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[reorderable]="true"</code> → giữ chuột ở header và kéo ngang để đổi thứ tự.</p>
-                <smart-grid [data]="products()" [reorderable]="true" [height]="320" (columnReorder)="onEvent('columnReorder', $event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(18)">{{ isCodeVisible(18) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(18)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[18]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 19 -->
-    <section class="section" id="section-19">
-        <div class="section-header" (click)="toggleSection(19)">
-            <h2>19. Command column — row edit (sửa / lưu / hủy / xóa)</h2>
-            <span class="chevron" [class.open]="isExpanded(19)">▼</span>
-        </div>
-        @if (isExpanded(19)) {
-            <div class="section-body">
-                <p class="section-desc"><code>smart-grid-command-column</code> hiển thị nút edit/remove; khi edit, hàng đó đổi thành các input để sửa.</p>
-                <smart-grid [data]="editProducts()" [height]="320" (edit)="onRowEdit('edit', $event)" (save)="onRowEdit('save', $event)" (cancel)="onRowEdit('cancel', $event)" (remove)="onRemove($event)">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                    <smart-grid-command-column title="Thao tác" [width]="160" />
-                </smart-grid>
-                @if (lastEvent()) { <p class="event-log">Last event: {{ lastEvent() }}</p> }
-                <button class="code-toggle" (click)="toggleCode(19)">{{ isCodeVisible(19) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(19)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[19]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 20 -->
-    <section class="section" id="section-20">
-        <div class="section-header" (click)="toggleSection(20)">
-            <h2>20. Checkbox / radio column — chọn hàng</h2>
-            <span class="chevron" [class.open]="isExpanded(20)">▼</span>
-        </div>
-        @if (isExpanded(20)) {
-            <div class="section-body">
-                <p class="section-desc"><code>smart-grid-checkbox-column</code>: header select-all (indeterminate), row chọn nhiều. <code>smart-grid-radio-column</code>: chọn đúng 1 hàng.</p>
-                <div class="toolbar">
-                    <span class="section-desc">Đã chọn: <strong>{{ guardedUnits() }}</strong> dòng</span>
-                </div>
-                <smart-grid [data]="products()" [height]="320" (selectionChange)="onSelectionChange($event)">
-                    <smart-grid-checkbox-column title="Chọn" width="60" />
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                <smart-grid [data]="products()" [height]="320" style="margin-top:16px" (selectionChange)="onSelectionChange($event)">
-                    <smart-grid-radio-column title="Chọn 1" width="70" />
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(20)">{{ isCodeVisible(20) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(20)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[20]"></code></pre>
-                }
-            </div>
-        }
-    </section>
-
-    <!-- 21 -->
-    <section class="section" id="section-21">
-        <div class="section-header" (click)="toggleSection(21)">
-            <h2>21. Span column — gom cột con thành 1 cell</h2>
-            <span class="chevron" [class.open]="isExpanded(21)">▼</span>
-        </div>
-        @if (isExpanded(21)) {
-            <div class="section-body">
-                <p class="section-desc"><code>smart-grid-span-column</code> gộp các cột con thành 1 cell duy nhất trong body (colspan = số cột con).</p>
-                <smart-grid [data]="products()" [height]="360">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-span-column title="Sản phẩm">
-                        <smart-grid-column field="ProductName" title="Tên" width="240" />
-                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                        <ng-template smartGridSpanCellTemplate let-dataItem>
-                            <div>
+                @if (activeSection() === 2) {
+                    <smart-grid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260">
+                            <ng-template smartGridHeaderTemplate let-column>
+                                <span class="header-custom">{{ column.title }}</span>
+                            </ng-template>
+                            <ng-template smartGridCellTemplate let-dataItem>
                                 <strong>{{ dataItem.ProductName }}</strong>
-                                <span style="color:#888; margin-left:8px">{{ dataItem.Category.Name }}</span>
+                                @if (dataItem.Discontinued) { <span class="badge">ngừng</span> }
+                            </ng-template>
+                        </smart-grid-column>
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" [style]="{ 'text-align': 'right' }">
+                            <ng-template smartGridCellTemplate let-dataItem>
+                                {{ dataItem.UnitPrice | number: '1.2-2' }} ₫
+                            </ng-template>
+                        </smart-grid-column>
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110">
+                            <ng-template smartGridCellTemplate let-dataItem>
+                                {{ dataItem.Discontinued ? 'Ngừng bán' : 'Đang bán' }}
+                            </ng-template>
+                        </smart-grid-column>
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 3) {
+                    <div class="toolbar">
+                        <button class="btn" (click)="toggleEmpty()">{{ emptyData().length === 0 ? 'Hiện dữ liệu' : 'Làm rỗng data' }}</button>
+                    </div>
+                    <smart-grid [data]="emptyData()" [height]="220">
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <ng-template smartGridNoRecordsTemplate>
+                            <div class="empty-box">Không có dữ liệu — no-records template tùy chỉnh.</div>
+                        </ng-template>
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 4) {
+                    <div class="toolbar">
+                        <button class="btn" (click)="toggleHighlight()">{{ highlightDiscontinued() ? 'Tắt highlight' : 'Highlight hàng ngừng bán' }}</button>
+                    </div>
+                    <smart-grid [data]="products()" [height]="300" [rowClass]="rowClassFn" [rowSelected]="selectedFn()">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 5) {
+                    <div class="toolbar">
+                        <button class="btn" (click)="toggleLoading()">{{ loading() ? 'Tắt loading' : 'Bật loading' }}</button>
+                        <button class="btn" (click)="toggleHeader()">{{ hideHeader() ? 'Hiện header' : 'Ẩn header' }}</button>
+                    </div>
+                    <smart-grid [data]="products()" [height]="300" [loading]="loading()" [hideHeader]="hideHeader()">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 6) {
+                    <smart-grid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="340" [detailExpandBy]="'ProductID'" (detailExpand)="onEvent('detailExpand', $event)" (detailCollapse)="onEvent('detailCollapse', $event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                        <ng-template smartGridDetailTemplate let-dataItem>
+                            <div class="detail-box">
+                                <strong>{{ dataItem.ProductName }}</strong>
+                                <ul>
+                                    <li>Product ID: {{ dataItem.ProductID }}</li>
+                                    <li>Danh mục: {{ dataItem.Category.Name }}</li>
+                                    <li>Đơn giá: {{ dataItem.UnitPrice | number: '1.2-2' }} ₫</li>
+                                    <li>Trạng thái: {{ dataItem.Discontinued ? 'Ngừng bán' : 'Đang bán' }}</li>
+                                </ul>
                             </div>
                         </ng-template>
-                    </smart-grid-span-column>
-                    <smart-grid-span-column title="Giá & trạng thái">
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 7) {
+                    <div class="toolbar">
+                        <button class="btn" (click)="toggleGroupByCategory()">{{ groups().length ? 'Ungroup Category' : 'Group theo Category (+ aggregates)' }}</button>
+                    </div>
+                    <smart-grid [data]="products()" [groupable]="true" [group]="groups()" (groupChange)="groupChangeHandler($event)" (groupExpand)="onEvent('groupExpand', $event)" (groupCollapse)="onEvent('groupCollapse', $event)" [height]="320">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
                         <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                        <smart-grid-column field="Discontinued" title="Trạng thái" width="120" />
-                    </smart-grid-span-column>
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(21)">{{ isCodeVisible(21) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(21)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[21]"></code></pre>
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
                 }
-            </div>
-        }
-    </section>
 
-    <!-- 22 -->
-    <section class="section" id="section-22">
-        <div class="section-header" (click)="toggleSection(22)">
-            <h2>22. Grid footer — aggregates (count / sum)</h2>
-            <span class="chevron" [class.open]="isExpanded(22)">▼</span>
-        </div>
-        @if (isExpanded(22)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[aggregates]</code> khai báo descriptor → grid footer row xuất hiện. Cột có <code>smartGridFooterTemplate</code> render tùy biến.</p>
-                <smart-grid [data]="products()" [aggregates]="aggregates" [height]="360">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="180" [style]="{ 'text-align': 'right' }" [footerStyle]="{ 'text-align': 'right', 'font-weight': '700' }">
-                        <ng-template smartGridFooterTemplate let-value>
-                            Sum: {{ value.sum | number: '1.2-2' }} ₫
-                        </ng-template>
-                    </smart-grid-column>
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(22)">{{ isCodeVisible(22) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(22)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[22]"></code></pre>
+                @if (activeSection() === 8) {
+                    <smart-grid [data]="products()" [filterable]="'row'" [pageable]="true" [pageSize]="5" [height]="320" (filterChange)="onEvent('filterChange', $event)" (dataStateChange)="onEvent('dataStateChange', $event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
                 }
-            </div>
-        }
-    </section>
 
-    <!-- 23 -->
-    <section class="section" id="section-23">
-        <div class="section-header" (click)="toggleSection(23)">
-            <h2>23. Column chooser — nút ẩn/hiện cột trên toolbar</h2>
-            <span class="chevron" [class.open]="isExpanded(23)">▼</span>
-        </div>
-        @if (isExpanded(23)) {
-            <div class="section-body">
-                <p class="section-desc"><code>[columnChooser]="true"</code> → toolbar hiện nút Columns, click mở popup liệt kê cột với checkbox ẩn/hiện.</p>
-                <smart-grid [data]="products()" [columnChooser]="true" [height]="320">
-                    <smart-grid-column field="ProductID" title="ID" width="70" />
-                    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-                    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-                    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
-                    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" [includeInChooser]="false" />
-                </smart-grid>
-                <button class="code-toggle" (click)="toggleCode(23)">{{ isCodeVisible(23) ? 'Hide Code' : 'Show Code' }}</button>
-                @if (isCodeVisible(23)) {
-                    <pre class="code-block"><code [textContent]="codeExamples[23]"></code></pre>
+                @if (activeSection() === 9) {
+                    <div class="toolbar">
+                        <span>Đã chọn: <strong>{{ guardedUnits() }}</strong> dòng</span>
+                    </div>
+                    <smart-grid [data]="products()" [selectable]="true" [pageable]="true" [pageSize]="5" [height]="320" (selectionChange)="onSelectionChange($event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
                 }
+
+                @if (activeSection() === 10) {
+                    <smart-grid [data]="products()" [resizable]="true" [height]="320">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 11) {
+                    <smart-grid [data]="products()" [columnMenu]="true" [sortable]="true" [height]="320" (sortChange)="onEvent('sortChange', $event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 12) {
+                    <smart-grid [data]="products()" [editable]="true" [pageable]="true" [pageSize]="5" [height]="320" (cellChange)="onEvent('cellChange', $event)" (cellClose)="onEvent('cellClose', $event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 13) {
+                    <smart-grid [smartGridDataBinding]="fetchProducts" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="320" [loading]="serverLoading()">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 14) {
+                    <div class="toolbar">
+                        <button class="btn" (click)="saveGridState()">Lưu state</button>
+                        <button class="btn" (click)="restoreGridState()">Khôi phục state</button>
+                    </div>
+                    <smart-grid #persistGrid [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="320" (stateChange)="onEvent('stateChange', $event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 15) {
+                    <smart-grid [data]="products()" [autoGenerateColumns]="true" [sortable]="true" [height]="320"></smart-grid>
+                }
+
+                @if (activeSection() === 16) {
+                    <smart-grid [data]="products()" [height]="320">
+                        <smart-grid-column-group title="Thông tin chung">
+                            <smart-grid-column field="ProductID" title="ID" width="70" />
+                            <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        </smart-grid-column-group>
+                        <smart-grid-column-group title="Kinh doanh">
+                            <smart-grid-column-group title="Giá">
+                                <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                            </smart-grid-column-group>
+                            <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                            <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                        </smart-grid-column-group>
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 17) {
+                    <smart-grid [data]="products()" [height]="320">
+                        <smart-grid-column field="ProductID" title="ID" width="80" [locked]="true" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="280" [locked]="true" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="180" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="220" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="160" />
+                        <smart-grid-column field="ProductID" title="ID lặp" width="180" />
+                        <smart-grid-column field="UnitPrice" title="Giá lặp" width="180" />
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 18) {
+                    <smart-grid [data]="products()" [reorderable]="true" [height]="320" (columnReorder)="onEvent('columnReorder', $event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 19) {
+                    <smart-grid [data]="editProducts()" [height]="320" (edit)="onRowEdit('edit', $event)" (save)="onRowEdit('save', $event)" (cancel)="onRowEdit('cancel', $event)" (remove)="onRemove($event)">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                        <smart-grid-command-column title="Thao tác" [width]="160" />
+                    </smart-grid>
+                    @if (lastEvent()) { <p class="event-log">{{ lastEvent() }}</p> }
+                }
+
+                @if (activeSection() === 20) {
+                    <div class="toolbar">
+                        <span>Đã chọn: <strong>{{ guardedUnits() }}</strong> dòng</span>
+                    </div>
+                    <smart-grid [data]="products()" [height]="320" (selectionChange)="onSelectionChange($event)">
+                        <smart-grid-checkbox-column title="Chọn" width="60" />
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    <smart-grid [data]="products()" [height]="320" style="margin-top:16px" (selectionChange)="onSelectionChange($event)">
+                        <smart-grid-radio-column title="Chọn 1" width="70" />
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 21) {
+                    <smart-grid [data]="products()" [height]="360">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-span-column title="Sản phẩm">
+                            <smart-grid-column field="ProductName" title="Tên" width="240" />
+                            <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                            <ng-template smartGridSpanCellTemplate let-dataItem>
+                                <div>
+                                    <strong>{{ dataItem.ProductName }}</strong>
+                                    <span style="color:#888; margin-left:8px">{{ dataItem.Category.Name }}</span>
+                                </div>
+                            </ng-template>
+                        </smart-grid-span-column>
+                        <smart-grid-span-column title="Giá & trạng thái">
+                            <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                            <smart-grid-column field="Discontinued" title="Trạng thái" width="120" />
+                        </smart-grid-span-column>
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 22) {
+                    <smart-grid [data]="products()" [aggregates]="aggregates" [height]="360">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="180" [style]="{ 'text-align': 'right' }" [footerStyle]="{ 'text-align': 'right', 'font-weight': '700' }">
+                            <ng-template smartGridFooterTemplate let-value>
+                                Sum: {{ value.sum | number: '1.2-2' }} ₫
+                            </ng-template>
+                        </smart-grid-column>
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                }
+
+                @if (activeSection() === 23) {
+                    <smart-grid [data]="products()" [columnChooser]="true" [height]="320">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" [includeInChooser]="false" />
+                    </smart-grid>
+                }
+
             </div>
         }
-    </section>
+
+        @if (activeTab() === 'code') {
+            <div class="code-panel">
+                <pre class="code-block"><code [textContent]="codeExamples[activeSection()]"></code></pre>
+            </div>
+        }
+    </div>
 </main>

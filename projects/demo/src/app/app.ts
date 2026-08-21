@@ -45,7 +45,6 @@ const PRODUCTS: Product[] = [
 })
 export class App {
     protected readonly products = signal<Product[]>(PRODUCTS);
-    /** Bản sao có thể chỉnh sửa (row-edit: save mutate tại chỗ, remove lọc bớt). */
     protected readonly editProducts = signal<Product[]>(PRODUCTS.map((p) => ({ ...p })));
     protected readonly emptyData = signal<Product[]>([]);
     protected readonly loading = signal(false);
@@ -55,42 +54,65 @@ export class App {
     protected readonly lastEvent = signal('');
     protected readonly groups = signal<GroupDescriptor[]>([]);
     protected readonly guardedUnits = signal(0);
-    /** Grid state đã lưu (state persistence — section 14). */
     protected savedState: DataStateChangeEvent | null = null;
     protected readonly persistGrid = viewChild<GridComponent>('persistGrid');
 
-    /** UI state cho sidebar + code toggle. */
-    protected readonly showSidebar = signal(false);
-    protected readonly expandedSections = signal<Record<number, boolean>>({ 1: true, 2: true, 3: true });
-    protected readonly codeVisible = signal<Record<number, boolean>>({});
+    protected readonly activeSection = signal(1);
+    protected readonly activeTab = signal<'demo' | 'code'>('demo');
+    protected readonly showMobileSidebar = signal(false);
+
+    protected readonly sectionDescriptions: Record<number, string> = {
+        1: 'Click header để sort (asc → desc → unsort). Pager có first/prev/next/last. Chiều cao cố định 300px.',
+        2: 'Header template (màu xanh), cell template (in đậm + badge, format số, text theo điều kiện).',
+        3: 'Khi data rỗng hiển thị template tự định nghĩa thay vì text mặc định.',
+        4: 'rowClass: hàng ngừng bán mờ đi. rowSelected: bật highlight nền theo function điều kiện.',
+        5: 'Loading: overlay spinner khi [loading]="true". hideHeader: ẩn/hiện thead.',
+        6: 'Click mũi tên đầu hàng để mở detail row. detailExpandBy = ProductID giữ trạng thái expand khi đổi trang.',
+        7: 'Bật [groupable] → header có nút group. Aggregates (sum/count) ở group footer.',
+        8: '[filterable]="\'row\'" → input dưới mỗi header. filterChange + dataStateChange phát mỗi lần lọc.',
+        9: '[selectable]="true" → cột checkbox: header select-all, row chọn từng dòng.',
+        10: '[resizable]="true" → kéo handle ở mép phải header để đổi width cột.',
+        11: '[columnMenu]="true" → nút ⋮ trên header: sort asc/desc + list cột ẩn/hiện.',
+        12: '[editable]="true" → dblclick cell để sửa. Enter/blur lưu, Esc hủy.',
+        13: '[smartGridDataBinding]="fetch" → grid tự gọi hàm fetch mỗi khi state thay đổi.',
+        14: 'getGridState()/setGridState() → lưu/khôi phục toàn bộ state (skip/sort/group/filter).',
+        15: '[autoGenerateColumns]="true" → grid tự tạo cột theo fields của data object.',
+        16: 'smart-grid-column-group bọc cột con → header lồng nhau (rowspan/colspan tự tính).',
+        17: '[locked]="true" → cột dính bên trái (sticky) khi cuộn ngang.',
+        18: '[reorderable]="true" → giữ chuột ở header kéo ngang để đổi thứ tự.',
+        19: 'smart-grid-command-column → nút edit/remove. Khi edit, hàng đổi thành input + save/cancel.',
+        20: 'smart-grid-checkbox-column: chọn nhiều. smart-grid-radio-column: chọn đúng 1.',
+        21: 'smart-grid-span-column gộp cột con thành 1 cell (colspan = số cột con).',
+        22: '[aggregates] khai báo descriptor → footer row. smartGridFooterTemplate render tùy biến.',
+        23: '[columnChooser]="true" → toolbar nút Columns, popup checkbox ẩn/hiện cột.',
+    };
 
     protected readonly sectionTitles: string[] = [
-        'Grid cơ bản — sort + pager',
-        'Custom templates — cell + header',
+        'Grid cơ bản',
+        'Custom templates',
         'No-records template',
         'rowClass + rowSelected',
-        'Loading mask + hideHeader',
+        'Loading + hideHeader',
         'Master detail',
-        'Grouping — group theo cột',
-        'Filter row — lọc theo cột',
-        'Selection — checkbox chọn dòng',
-        'Resizable — kéo mép cột',
-        'Column menu — sort + ẩn/hiện',
-        'Inline editing — double-click',
-        'Server-driven data binding',
+        'Grouping',
+        'Filter row',
+        'Selection',
+        'Resizable',
+        'Column menu',
+        'Inline editing',
+        'Server-driven binding',
         'State persistence',
         'autoGenerateColumns',
-        'Column group — header nhiều tầng',
-        'Locked columns — cột cố định',
-        'Column reorder — kéo thả',
-        'Command column — row edit',
-        'Checkbox / radio column',
-        'Span column — gom cột con',
-        'Grid footer — aggregates',
-        'Column chooser — ẩn/hiện cột',
+        'Column group',
+        'Locked columns',
+        'Column reorder',
+        'Command column',
+        'Checkbox / radio',
+        'Span column',
+        'Footer aggregates',
+        'Column chooser',
     ];
 
-    /** Code examples for each section — stored as TS strings to avoid Angular template parsing of `{`/`}`. */
     protected readonly codeExamples: Record<number, string> = {
         1: `<smart-grid
     [data]="products()"
@@ -180,7 +202,6 @@ selectedFn = computed(() => {
                 <li>Product ID: {{ '{{' }} dataItem.ProductID {{ '}}' }}</li>
                 <li>Danh mục: {{ '{{' }} dataItem.Category.Name {{ '}}' }}</li>
                 <li>Đơn giá: {{ '{{' }} dataItem.UnitPrice | number: '1.2-2' {{ '}}' }} ₫</li>
-                <li>Trạng thái: {{ '{{' }} dataItem.Discontinued ? 'Ngừng bán' : 'Đang bán' {{ '}}' }}</li>
             </ul>
         </div>
     </ng-template>
@@ -253,7 +274,6 @@ selectedFn = computed(() => {
 // Component:
 fetchProducts: DataBindingFetch = (state: DataStateChangeEvent) => {
     return this.http.get<GridDataResult>('/api/products', { params: state });
-    // hoặc trả Promise / Observable / GridDataResult trực tiếp
 };`,
         14: `<smart-grid #persistGrid [data]="products()" [sortable]="true"
     [pageable]="true" [pageSize]="5" [height]="320"
@@ -313,8 +333,7 @@ restoreGridState() {
     <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
     <smart-grid-command-column title="Thao tác" [width]="160" />
 </smart-grid>`,
-        20: `<!-- Checkbox: chọn nhiều -->
-<smart-grid [data]="products()" [height]="320"
+        20: `<smart-grid [data]="products()" [height]="320"
     (selectionChange)="onSelectionChange($event)">
     <smart-grid-checkbox-column title="Chọn" width="60" />
     <smart-grid-column field="ProductID" title="ID" width="70" />
@@ -323,7 +342,6 @@ restoreGridState() {
     <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
 </smart-grid>
 
-<!-- Radio: chọn 1 -->
 <smart-grid [data]="products()" [height]="320"
     (selectionChange)="onSelectionChange($event)">
     <smart-grid-radio-column title="Chọn 1" width="70" />
@@ -349,13 +367,11 @@ restoreGridState() {
         <smart-grid-column field="Discontinued" title="Trạng thái" width="120" />
     </smart-grid-span-column>
 </smart-grid>`,
-        22: `<!-- Component: -->
-aggregates: AggregateDescriptor[] = [
+        22: `aggregates: AggregateDescriptor[] = [
     { field: 'ProductID', aggregate: 'count' },
     { field: 'UnitPrice', aggregate: 'sum' },
 ];
 
-<!-- Template: -->
 <smart-grid [data]="products()" [aggregates]="aggregates" [height]="360">
     <smart-grid-column field="ProductID" title="ID" width="70" />
     <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
@@ -379,35 +395,21 @@ aggregates: AggregateDescriptor[] = [
 </smart-grid>`,
     };
 
-    protected toggleSidebar(): void {
-        this.showSidebar.update((v) => !v);
+    protected selectSection(n: number): void {
+        this.activeSection.set(n);
+        this.activeTab.set('demo');
+        this.lastEvent.set('');
+        this.showMobileSidebar.set(false);
     }
 
-    protected setSection(n: number): void {
-        this.expandedSections.update((s) => ({ ...s, [n]: true }));
-        this.showSidebar.set(false);
-        setTimeout(() => {
-            document.getElementById(`section-${n}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+    protected switchTab(tab: 'demo' | 'code'): void {
+        this.activeTab.set(tab);
     }
 
-    protected toggleSection(n: number): void {
-        this.expandedSections.update((s) => ({ ...s, [n]: !s[n] }));
+    protected toggleMobileSidebar(): void {
+        this.showMobileSidebar.update((v) => !v);
     }
 
-    protected isExpanded(n: number): boolean {
-        return this.expandedSections()[n] ?? false;
-    }
-
-    protected toggleCode(n: number): void {
-        this.codeVisible.update((s) => ({ ...s, [n]: !s[n] }));
-    }
-
-    protected isCodeVisible(n: number): boolean {
-        return this.codeVisible()[n] ?? false;
-    }
-
-    /** Aggregates cho grid footer (section 22). */
     protected readonly aggregates: AggregateDescriptor[] = [
         { field: 'ProductID', aggregate: 'count' },
         { field: 'UnitPrice', aggregate: 'sum' },
@@ -473,9 +475,6 @@ aggregates: AggregateDescriptor[] = [
         this.lastEvent.set(`${name}: ${JSON.stringify(payload)}`);
     }
 
-    /* ── Section 13: server-driven data binding ──────────────────────── */
-
-    /** Giả lập server: trả về Promise sau 400ms, áp sort/filter/group/page local. */
     protected readonly fetchProducts: DataBindingFetch = (state: DataStateChangeEvent): Promise<GridDataResult> => {
         this.serverLoading.set(true);
         return new Promise<GridDataResult>((resolve) => {
@@ -490,8 +489,6 @@ aggregates: AggregateDescriptor[] = [
         });
     };
 
-    /* ── Section 14: state persistence ───────────────────────────────── */
-
     protected saveGridState(): void {
         this.savedState = this.persistGrid()?.getGridState() ?? null;
         this.lastEvent.set(`state saved: ${JSON.stringify(this.savedState)}`);
@@ -502,8 +499,6 @@ aggregates: AggregateDescriptor[] = [
             this.persistGrid()?.setGridState(this.savedState);
         }
     }
-
-    /* ── Section 19: command column — row edit ──────────────────────── */
 
     protected onRowEdit(name: string, event: EditEvent): void {
         this.lastEvent.set(`${name}: ${JSON.stringify(event.dataItem)}`);
