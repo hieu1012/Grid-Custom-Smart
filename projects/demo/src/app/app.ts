@@ -57,9 +57,29 @@ export class App {
     protected savedState: DataStateChangeEvent | null = null;
     protected readonly persistGrid = viewChild<GridComponent>('persistGrid');
 
-    protected readonly activeSection = signal(1);
+    protected readonly activeSection = signal(0);
     protected readonly activeTab = signal<'demo' | 'code'>('demo');
     protected readonly showMobileSidebar = signal(false);
+    protected readonly copiedIndex = signal<number | null>(null);
+
+    protected readonly playground = signal({
+        headerBg: '#f8f9fa',
+        headerText: '#1a1a2e',
+        headerBorder: '#dee2e6',
+        cellBg: '#ffffff',
+        cellText: '#212529',
+        cellBorder: '#dee2e6',
+        borderColor: '#dee2e6',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderRadius: '0px',
+        cellPadding: '8px 12px',
+        headerPadding: '10px 12px',
+        headerFontWeight: '600',
+        alignment: 'left' as 'left' | 'center' | 'right',
+        stripedRows: false,
+        hoverHighlight: true,
+    });
 
     protected readonly sectionDescriptions: Record<number, string> = {
         1: 'Click header để sort (asc → desc → unsort). Pager có first/prev/next/last. Chiều cao cố định 300px.',
@@ -114,6 +134,32 @@ export class App {
     ];
 
     protected readonly codeExamples: Record<number, string> = {
+        0: `# 1. Cài đặt từ GitHub
+npm i https://github.com/hieu1012/Grid-Custom-Smart.git
+
+# 2. Peer dependency (tự cài khi cần)
+npm i @progress/kendo-svg-icons
+
+# 3. Thêm theme CSS vào styles.scss
+@import '@progress/kendo-theme-default/dist/all.css';
+
+# 4. Import trong component
+import { SmartGridModule } from 'smart-grid';
+
+@Component({
+    imports: [SmartGridModule],
+    template: \`
+        <smart-grid [data]="products" [sortable]="true"
+            [pageable]="true" [pageSize]="5" [height]="300">
+            <smart-grid-column field="ID" title="ID" width="70" />
+            <smart-grid-column field="Name" title="Tên" width="260" />
+            <smart-grid-column field="Price" title="Giá" width="140" />
+        </smart-grid>
+    \`,
+})
+export class MyComponent {
+    products = [{ ID: 1, Name: 'Chai', Price: 18 }];
+}`,
         1: `<smart-grid
     [data]="products()"
     [sortable]="true"
@@ -393,6 +439,28 @@ restoreGridState() {
     <smart-grid-column field="Discontinued" title="Trạng thái" width="110"
         [includeInChooser]="false" />
 </smart-grid>`,
+        24: `/* Playground CSS — copy vào styles.scss của bạn */
+.my-grid.k-grid {
+    border-color: var(--pg-border-color);
+    border-width: var(--pg-border-width);
+    border-style: var(--pg-border-style);
+    border-radius: var(--pg-border-radius);
+}
+.my-grid .k-table-th {
+    background: var(--pg-header-bg);
+    color: var(--pg-header-text);
+    border-color: var(--pg-header-border);
+    padding: var(--pg-header-padding);
+    font-weight: var(--pg-header-font-weight);
+    text-align: var(--pg-alignment);
+}
+.my-grid .k-table-td {
+    background: var(--pg-cell-bg);
+    color: var(--pg-cell-text);
+    border-color: var(--pg-cell-border);
+    padding: var(--pg-cell-padding);
+    text-align: var(--pg-alignment);
+}`,
     };
 
     protected selectSection(n: number): void {
@@ -409,6 +477,85 @@ restoreGridState() {
     protected toggleMobileSidebar(): void {
         this.showMobileSidebar.update((v) => !v);
     }
+
+    protected async copyCode(index: number): Promise<void> {
+        const code = this.codeExamples[index];
+        if (code) {
+            await navigator.clipboard.writeText(code);
+            this.copiedIndex.set(index);
+            setTimeout(() => this.copiedIndex.set(null), 2000);
+        }
+    }
+
+    protected updatePlayground(key: string, value: string | boolean): void {
+        this.playground.update((p) => ({ ...p, [key]: value }));
+    }
+
+    protected get playgroundCss(): Record<string, string> {
+        const p = this.playground();
+        return {
+            '--pg-header-bg': p.headerBg,
+            '--pg-header-text': p.headerText,
+            '--pg-header-border': p.headerBorder,
+            '--pg-cell-bg': p.cellBg,
+            '--pg-cell-text': p.cellText,
+            '--pg-cell-border': p.cellBorder,
+            '--pg-border-color': p.borderColor,
+            '--pg-border-width': p.borderWidth,
+            '--pg-border-style': p.borderStyle,
+            '--pg-border-radius': p.borderRadius,
+            '--pg-cell-padding': p.cellPadding,
+            '--pg-header-padding': p.headerPadding,
+            '--pg-header-font-weight': p.headerFontWeight,
+            '--pg-alignment': p.alignment,
+        };
+    }
+
+    protected readonly installStep3Code = `import { Component } from '@angular/core';
+import { SmartGridModule } from 'smart-grid';
+
+@Component({
+    selector: 'app-products',
+    imports: [SmartGridModule],
+    template: \`
+        &lt;smart-grid [data]="products" [sortable]="true"
+            [pageable]="true" [pageSize]="5" [height]="300"&gt;
+            &lt;smart-grid-column field="ID" title="ID" width="70" /&gt;
+            &lt;smart-grid-column field="Name" title="Tên" width="260" /&gt;
+            &lt;smart-grid-column field="Price" title="Giá" width="140" /&gt;
+        &lt;/smart-grid&gt;
+    \`,
+})
+export class ProductsComponent {
+    products = [
+        { ID: 1, Name: 'Chai', Price: 18 },
+        { ID: 2, Name: 'Chang', Price: 19 },
+    ];
+}`;
+
+    protected readonly installStep4Code = `import { SmartGridModule } from 'smart-grid';
+// SmartGridModule đã re-export tất cả components/directives
+
+// Sử dụng:
+@Component({
+    imports: [SmartGridModule],
+    // ...
+})
+export class MyComponent {}`;
+
+    protected readonly playgroundCode = `<smart-grid [data]="products()" [sortable]="true" [pageable]="true"
+    [pageSize]="5" [height]="300" class="my-grid">
+    <smart-grid-column field="ProductID" title="ID" width="70" />
+    <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+</smart-grid>
+
+/* styles.scss — custom grid appearance */
+.my-grid.k-grid { border-color: var(--pg-border-color); border-width: var(--pg-border-width); border-style: var(--pg-border-style); border-radius: var(--pg-border-radius); }
+.my-grid .k-table-th { background: var(--pg-header-bg); color: var(--pg-header-text); border-color: var(--pg-header-border); padding: var(--pg-header-padding); font-weight: var(--pg-header-font-weight); text-align: var(--pg-alignment); }
+.my-grid .k-table-td { background: var(--pg-cell-bg); color: var(--pg-cell-text); border-color: var(--pg-cell-border); padding: var(--pg-cell-padding); text-align: var(--pg-alignment); }`;
 
     protected readonly aggregates: AggregateDescriptor[] = [
         { field: 'ProductID', aggregate: 'count' },

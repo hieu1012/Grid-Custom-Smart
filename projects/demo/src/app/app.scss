@@ -206,6 +206,161 @@
   border-radius: 8px;
   overflow-x: auto;
   white-space: pre;
+  flex: 1;
+}
+
+/* ── Code with copy button ── */
+.code-with-copy {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  font-size: 0.82rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #c9d1d9;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  z-index: 1;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+  }
+
+  &.copied {
+    background: rgba(63, 185, 80, 0.2);
+    color: #3fb950;
+    border-color: rgba(63, 185, 80, 0.3);
+  }
+}
+
+/* ── Installation Guide ── */
+.install-guide {
+  max-width: 800px;
+}
+
+.install-step {
+  margin-bottom: 28px;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  p {
+    margin: 6px 0;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+
+    code {
+      background: #f0f2f5;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+  }
+}
+
+.api-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 8px;
+
+  th, td {
+    padding: 7px 10px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+  }
+
+  th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  td code {
+    background: #f0f2f5;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ── Playground ── */
+.playground-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.playground-controls {
+  width: 240px;
+  flex-shrink: 0;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+
+  h3 {
+    margin: 16px 0 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 4px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+
+  label {
+    min-width: 80px;
+    color: #555;
+  }
+
+  input[type="color"] {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 1px;
+    cursor: pointer;
+  }
+
+  input[type="text"],
+  select {
+    flex: 1;
+    padding: 3px 6px;
+    font-size: 0.78rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+  }
+}
+
+.playground-preview {
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Toolbar ── */
@@ -295,6 +450,11 @@ kendo-grid {
   }
 }
 
+/* ── Nav special items ── */
+.nav-special {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .hamburger {
@@ -329,5 +489,13 @@ kendo-grid {
 
   .content-header h1 {
     font-size: 1.1rem;
+  }
+
+  .playground-layout {
+    flex-direction: column;
+  }
+
+  .playground-controls {
+    width: 100%;
   }
 }

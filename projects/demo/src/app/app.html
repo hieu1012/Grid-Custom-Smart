@@ -9,6 +9,11 @@
         <span class="brand-text">smart-grid</span>
     </div>
     <nav>
+        <a class="nav-item nav-special" [class.active]="activeSection() === 0"
+           (click)="selectSection(0)">
+            <span class="nav-num">📖</span>
+            <span class="nav-label">Cài đặt & Sử dụng</span>
+        </a>
         @for (title of sectionTitles; track $index; let i = $index) {
             <a class="nav-item" [class.active]="activeSection() === i + 1"
                (click)="selectSection(i + 1)">
@@ -16,24 +21,207 @@
                 <span class="nav-label">{{ title }}</span>
             </a>
         }
+        <a class="nav-item nav-special" [class.active]="activeSection() === 24"
+           (click)="selectSection(24)">
+            <span class="nav-num">🎨</span>
+            <span class="nav-label">Grid Playground</span>
+        </a>
     </nav>
 </aside>
 
 <main class="main-content">
     <header class="content-header">
-        <h1>{{ activeSection() }}. {{ sectionTitles[activeSection() - 1] }}</h1>
-        <p class="section-desc">{{ sectionDescriptions[activeSection()] }}</p>
-        <div class="tabs">
-            <button class="tab" [class.active]="activeTab() === 'demo'" (click)="switchTab('demo')">
-                <span class="tab-icon">▶</span> Demo
-            </button>
-            <button class="tab" [class.active]="activeTab() === 'code'" (click)="switchTab('code')">
-                <span class="tab-icon">&lt;/&gt;</span> Code
-            </button>
-        </div>
+        @if (activeSection() === 0) {
+            <h1>📖 Cài đặt & Sử dụng smart-grid</h1>
+            <p class="section-desc">Hướng dẫn từ A-Z: cài đặt, cấu hình, import và sử dụng grid component.</p>
+        } @else if (activeSection() === 24) {
+            <h1>🎨 Grid Playground</h1>
+            <p class="section-desc">Tùy chỉnh màu sắc, border, căn chỉnh cột — xem kết quả realtime và lấy code CSS.</p>
+        } @else {
+            <h1>{{ activeSection() }}. {{ sectionTitles[activeSection() - 1] }}</h1>
+            <p class="section-desc">{{ sectionDescriptions[activeSection()] }}</p>
+        }
+        @if (activeSection() !== 0 && activeSection() !== 24) {
+            <div class="tabs">
+                <button class="tab" [class.active]="activeTab() === 'demo'" (click)="switchTab('demo')">
+                    <span class="tab-icon">▶</span> Demo
+                </button>
+                <button class="tab" [class.active]="activeTab() === 'code'" (click)="switchTab('code')">
+                    <span class="tab-icon">&lt;/&gt;</span> Code
+                </button>
+            </div>
+        }
     </header>
 
     <div class="content-body">
+        @if (activeSection() === 0) {
+            <div class="install-guide">
+                <div class="install-step">
+                    <h3>Bước 1: Cài đặt từ GitHub</h3>
+                    <div class="code-with-copy">
+                        <pre class="code-block"><code>npm i https://github.com/hieu1012/Grid-Custom-Smart.git</code></pre>
+                        <button class="copy-btn" (click)="copyCode(0)">📋</button>
+                    </div>
+                    <p>Peer dependency sẽ tự cài: <code>@progress/kendo-svg-icons</code></p>
+                </div>
+                <div class="install-step">
+                    <h3>Bước 2: Thêm theme CSS</h3>
+                    <p>Thêm vào <code>styles.scss</code> của app:</p>
+                    <div class="code-with-copy">
+                        <pre class="code-block"><code>@import '@progress/kendo-theme-default/dist/all.css';</code></pre>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <h3>Bước 3: Import SmartGridModule</h3>
+                    <p>Trong component của bạn:</p>
+                    <div class="code-with-copy">
+                        <pre class="code-block"><code [textContent]="installStep3Code"></code></pre>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <h3>Bước 4: Có thể dùng module (tùy chọn)</h3>
+                    <p>Nếu muốn import tất cả cùng lúc thay vì từng component:</p>
+                    <div class="code-with-copy">
+                        <pre class="code-block"><code [textContent]="installStep4Code"></code></pre>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <h3>Bước 5: Các inputs phổ biến</h3>
+                    <table class="api-table">
+                        <thead><tr><th>Input</th><th>Type</th><th>Mô tả</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>[data]</code></td><td>any[] | GridDataResult</td><td>Dữ liệu hiển thị</td></tr>
+                            <tr><td><code>[sortable]</code></td><td>boolean</td><td>Bật sort trên header</td></tr>
+                            <tr><td><code>[pageable]</code></td><td>boolean</td><td>Bật phân trang</td></tr>
+                            <tr><td><code>[pageSize]</code></td><td>number</td><td>Số dòng/trang</td></tr>
+                            <tr><td><code>[height]</code></td><td>number</td><td>Chiều cao cố định (px)</td></tr>
+                            <tr><td><code>[filterable]</code></td><td>'row' | boolean</td><td>Bật filter row</td></tr>
+                            <tr><td><code>[groupable]</code></td><td>boolean</td><td>Bật grouping</td></tr>
+                            <tr><td><code>[selectable]</code></td><td>boolean</td><td>Bật selection (checkbox)</td></tr>
+                            <tr><td><code>[editable]</code></td><td>boolean</td><td>Bật inline edit (dblclick)</td></tr>
+                            <tr><td><code>[resizable]</code></td><td>boolean</td><td>Kéo mép cột đổi width</td></tr>
+                            <tr><td><code>[reorderable]</code></td><td>boolean</td><td>Kéo thả header đổi thứ tự</td></tr>
+                            <tr><td><code>[columnMenu]</code></td><td>boolean</td><td>Nút ⋮ trên header</td></tr>
+                            <tr><td><code>[loading]</code></td><td>boolean</td><td>Hiện loading mask</td></tr>
+                            <tr><td><code>[autoGenerateColumns]</code></td><td>boolean</td><td>Tự sinh cột theo data</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (activeSection() === 24) {
+            <div class="playground-layout">
+                <div class="playground-controls">
+                    <h3>Header</h3>
+                    <div class="control-row">
+                        <label>Màu nền:</label>
+                        <input type="color" [value]="playground().headerBg" (input)="updatePlayground('headerBg', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Màu chữ:</label>
+                        <input type="color" [value]="playground().headerText" (input)="updatePlayground('headerText', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Border:</label>
+                        <input type="color" [value]="playground().headerBorder" (input)="updatePlayground('headerBorder', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Padding:</label>
+                        <input type="text" [value]="playground().headerPadding" (input)="updatePlayground('headerPadding', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Font weight:</label>
+                        <select [value]="playground().headerFontWeight" (change)="updatePlayground('headerFontWeight', $any($event.target).value)">
+                            <option value="400">Normal (400)</option>
+                            <option value="600">Semi Bold (600)</option>
+                            <option value="700">Bold (700)</option>
+                        </select>
+                    </div>
+
+                    <h3>Data Cells</h3>
+                    <div class="control-row">
+                        <label>Màu nền:</label>
+                        <input type="color" [value]="playground().cellBg" (input)="updatePlayground('cellBg', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Màu chữ:</label>
+                        <input type="color" [value]="playground().cellText" (input)="updatePlayground('cellText', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Border:</label>
+                        <input type="color" [value]="playground().cellBorder" (input)="updatePlayground('cellBorder', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Padding:</label>
+                        <input type="text" [value]="playground().cellPadding" (input)="updatePlayground('cellPadding', $any($event.target).value)">
+                    </div>
+
+                    <h3>Border</h3>
+                    <div class="control-row">
+                        <label>Màu viền:</label>
+                        <input type="color" [value]="playground().borderColor" (input)="updatePlayground('borderColor', $any($event.target).value)">
+                    </div>
+                    <div class="control-row">
+                        <label>Độ dày:</label>
+                        <select [value]="playground().borderWidth" (change)="updatePlayground('borderWidth', $any($event.target).value)">
+                            <option value="0px">Không có</option>
+                            <option value="1px">1px</option>
+                            <option value="2px">2px</option>
+                            <option value="3px">3px</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label>Kiểu:</label>
+                        <select [value]="playground().borderStyle" (change)="updatePlayground('borderStyle', $any($event.target).value)">
+                            <option value="solid">Solid</option>
+                            <option value="dashed">Dashed</option>
+                            <option value="dotted">Dotted</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label>Border radius:</label>
+                        <select [value]="playground().borderRadius" (change)="updatePlayground('borderRadius', $any($event.target).value)">
+                            <option value="0px">0px</option>
+                            <option value="4px">4px</option>
+                            <option value="8px">8px</option>
+                            <option value="12px">12px</option>
+                        </select>
+                    </div>
+
+                    <h3>Layout</h3>
+                    <div class="control-row">
+                        <label>Căn lề:</label>
+                        <select [value]="playground().alignment" (change)="updatePlayground('alignment', $any($event.target).value)">
+                            <option value="left">Trái</option>
+                            <option value="center">Giữa</option>
+                            <option value="right">Phải</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label><input type="checkbox" [checked]="playground().stripedRows" (change)="updatePlayground('stripedRows', $any($event.target).checked)"> Zebra stripes</label>
+                    </div>
+                    <div class="control-row">
+                        <label><input type="checkbox" [checked]="playground().hoverHighlight" (change)="updatePlayground('hoverHighlight', $any($event.target).checked)"> Hover highlight</label>
+                    </div>
+                </div>
+                <div class="playground-preview" [style]="playgroundCss">
+                    <smart-grid class="my-grid" [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300">
+                        <smart-grid-column field="ProductID" title="ID" width="70" />
+                        <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+                        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+                        <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+                        <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+                    </smart-grid>
+                    <div class="code-with-copy" style="margin-top:16px">
+                        <pre class="code-block"><code [textContent]="playgroundCode"></code></pre>
+                        <button class="copy-btn" (click)="copyCode(24)">📋</button>
+                    </div>
+                </div>
+            </div>
+        }
+
         @if (activeTab() === 'demo') {
             <div class="demo-panel">
 
@@ -353,7 +541,10 @@
 
         @if (activeTab() === 'code') {
             <div class="code-panel">
-                <pre class="code-block"><code [textContent]="codeExamples[activeSection()]"></code></pre>
+                <div class="code-with-copy">
+                    <pre class="code-block"><code [textContent]="codeExamples[activeSection()]"></code></pre>
+                    <button class="copy-btn" (click)="copyCode(activeSection())">📋</button>
+                </div>
             </div>
         }
     </div>
