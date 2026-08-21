@@ -1,6 +1,6 @@
-# emi-grid
+# smart-grid
 
-Grid component cho Angular — standalone, không dependency Kendo UI (chỉ dùng theme class names + `@progress/kendo-svg-icons` cho icons). Implement theo contract `kendo-grid` (Kendo UI for Angular) nên có thể thay thế trực tiếp.
+Grid component cho Angular — standalone, không dependency Kendo UI (chỉ dùng theme class names + `@progress/kendo-svg-icons` cho icons). Implement theo contract `kendo-grid` (Kendo UI for Angular) nên có thể thay thế trực tiếp — selector chính là `smart-grid` (giữ alias `kendo-grid` để tương thích).
 
 ## Demo online
 
@@ -36,17 +36,17 @@ Import `GridComponent` và các column component trong component của bạn:
 
 ```ts
 import { Component } from '@angular/core';
-import { GridComponent, ColumnComponent } from 'emi-grid';
+import { GridComponent, ColumnComponent } from 'smart-grid';
 
 @Component({
     selector: 'app-products',
     imports: [GridComponent, ColumnComponent],
     template: `
-        <kendo-grid [data]="products" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300">
-            <kendo-grid-column field="ProductID" title="ID" width="70" />
-            <kendo-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-            <kendo-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-        </kendo-grid>
+        <smart-grid [data]="products" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300">
+            <smart-grid-column field="ProductID" title="ID" width="70" />
+            <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+            <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+        </smart-grid>
     `,
 })
 export class ProductsComponent {
@@ -64,10 +64,10 @@ export class ProductsComponent {
 - Master detail, custom cell/header/no-records/detail templates
 - Row editing (inline cell edit + command column row edit)
 - Locked columns, column reorder, resizable, column menu, column chooser
-- Server-driven data binding (`kendoGridDataBinding`)
+- Server-driven data binding (`smartGridDataBinding`)
 - State persistence (`getGridState()` / `setGridState()`)
 - `autoGenerateColumns`, span column, column group (header multi-level)
-- Grid footer aggregates (`[aggregates]` + `kendoGridFooterTemplate`)
+- Grid footer aggregates (`[aggregates]` + `smartGridFooterTemplate`)
 - Responsive: ẩn/hiện cột theo media query (`[media]` trên column)
 
 ## Demo local
@@ -83,14 +83,14 @@ npx ng serve demo
 ## Build & test
 
 ```bash
-npx ng build emi-grid   # output vào dist/emi-grid (đã commit cho git install)
-npx ng test emi-grid --watch=false --browsers=ChromeHeadless
+npx ng build smart-grid   # output vào dist/smart-grid (đã commit cho git install)
+npx ng test smart-grid --watch=false --browsers=ChromeHeadless
 ```
 
 ## Structure
 
-- `projects/emi-grid/src/lib/` — source của thư viện
-- `projects/emi-grid/src/lib/query/` — sort / filter / group / paging / aggregates (port từ Kendo)
+- `projects/smart-grid/src/lib/` — source của thư viện
+- `projects/smart-grid/src/lib/query/` — sort / filter / group / paging / aggregates (port từ Kendo)
 - `projects/demo/` — demo app showcase
 
 ## License

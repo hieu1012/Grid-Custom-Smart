@@ -7,20 +7,20 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "emi-grid": {
+    "smart-grid": {
       "projectType": "library",
-      "root": "projects/emi-grid",
-      "sourceRoot": "projects/emi-grid/src",
-      "prefix": "emi",
+      "root": "projects/smart-grid",
+      "sourceRoot": "projects/smart-grid/src",
+      "prefix": "smart",
       "architect": {
         "build": {
           "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
-              "tsConfig": "projects/emi-grid/tsconfig.lib.prod.json"
+              "tsConfig": "projects/smart-grid/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/emi-grid/tsconfig.lib.json"
+              "tsConfig": "projects/smart-grid/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -32,7 +32,7 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "projects/emi-grid/tsconfig.spec.json"
+            "tsConfig": "projects/smart-grid/tsconfig.spec.json"
           }
         }
       }

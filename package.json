@@ -1,26 +1,26 @@
 {
-  "name": "emi-grid",
+  "name": "smart-grid",
   "version": "1.0.0",
   "description": "Standalone grid component for Angular (kendo-grid compatible contract)",
-  "main": "dist/emi-grid/fesm2022/emi-grid.mjs",
-  "module": "dist/emi-grid/fesm2022/emi-grid.mjs",
-  "typings": "dist/emi-grid/index.d.ts",
+  "main": "dist/smart-grid/fesm2022/smart-grid.mjs",
+  "module": "dist/smart-grid/fesm2022/smart-grid.mjs",
+  "typings": "dist/smart-grid/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/emi-grid/index.d.ts",
-      "default": "./dist/emi-grid/fesm2022/emi-grid.mjs"
+      "types": "./dist/smart-grid/index.d.ts",
+      "default": "./dist/smart-grid/fesm2022/smart-grid.mjs"
     },
     "./package.json": "./package.json"
   },
   "files": [
-    "dist/emi-grid"
+    "dist/smart-grid"
   ],
   "sideEffects": false,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "prepare": "ng build emi-grid",
+    "prepare": "ng build smart-grid",
     "test": "ng test"
   },
   "peerDependencies": {

@@ -1,4 +1,4 @@
-# emi-grid — Hướng dẫn cài đặt & sử dụng
+# smart-grid — Hướng dẫn cài đặt & sử dụng
 
 ## Demo online
 
@@ -46,24 +46,24 @@ Cài theme nếu chưa có: `npm i @progress/kendo-theme-default`
 
 ```ts
 import { Component } from '@angular/core';
-import { GridComponent, ColumnComponent } from 'emi-grid';
+import { GridComponent, ColumnComponent } from 'smart-grid';
 
 @Component({
     selector: 'app-products',
     imports: [GridComponent, ColumnComponent],
     template: `
-        <kendo-grid
+        <smart-grid
             [data]="products"
             [sortable]="true"
             [pageable]="true"
             [pageSize]="5"
             [height]="300"
         >
-            <kendo-grid-column field="ProductID" title="ID" width="70" />
-            <kendo-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
-            <kendo-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-            <kendo-grid-column field="Discontinued" title="Trạng thái" width="110" />
-        </kendo-grid>
+            <smart-grid-column field="ProductID" title="ID" width="70" />
+            <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
+            <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+            <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+        </smart-grid>
     `,
 })
 export class ProductsComponent {
@@ -80,7 +80,7 @@ Cột field có thể truy cập lồng nhau: `field="Category.Name"`.
 
 ## 3. Các loại cột
 
-### 3.1 Cột thường — `kendo-grid-column`
+### 3.1 Cột thường — `smart-grid-column`
 
 | Input | Type | Mô tả |
 |---|---|---|
@@ -105,25 +105,25 @@ Cột field có thể truy cập lồng nhau: `field="Category.Name"`.
 ### 3.2 Column group — header nhiều tầng
 
 ```html
-<kendo-grid-column-group title="Kinh doanh">
-    <kendo-grid-column-group title="Giá">
-        <kendo-grid-column field="UnitPrice" title="Đơn giá" width="140" />
-    </kendo-grid-column-group>
-    <kendo-grid-column field="Discontinued" title="Trạng thái" width="110" />
-</kendo-grid-column-group>
+<smart-grid-column-group title="Kinh doanh">
+    <smart-grid-column-group title="Giá">
+        <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
+    </smart-grid-column-group>
+    <smart-grid-column field="Discontinued" title="Trạng thái" width="110" />
+</smart-grid-column-group>
 ```
 
 ### 3.3 Span column — gom cột con thành 1 cell
 
 ```html
-<kendo-grid-span-column title="Sản phẩm">
-    <kendo-grid-column field="ProductName" title="Tên" width="240" />
-    <kendo-grid-column field="Category.Name" title="Danh mục" width="160" />
-    <ng-template kendoGridSpanCellTemplate let-dataItem>
+<smart-grid-span-column title="Sản phẩm">
+    <smart-grid-column field="ProductName" title="Tên" width="240" />
+    <smart-grid-column field="Category.Name" title="Danh mục" width="160" />
+    <ng-template smartGridSpanCellTemplate let-dataItem>
         <strong>{{ dataItem.ProductName }}</strong>
         <span style="color:#888">{{ dataItem.Category.Name }}</span>
     </ng-template>
-</kendo-grid-span-column>
+</smart-grid-span-column>
 ```
 
 Không khai báo template → các giá trị tự xếp dọc. Body cell colspan = số cột con.
@@ -131,10 +131,10 @@ Không khai báo template → các giá trị tự xếp dọc. Body cell colspa
 ### 3.4 Checkbox column — chọn nhiều
 
 ```html
-<kendo-grid [data]="products" (selectionChange)="onSelection($event)">
-    <kendo-grid-checkbox-column title="Chọn" width="60" showSelectAll="true" />
+<smart-grid [data]="products" (selectionChange)="onSelection($event)">
+    <smart-grid-checkbox-column title="Chọn" width="60" showSelectAll="true" />
     <!-- ...các cột khác -->
-</kendo-grid>
+</smart-grid>
 ```
 
 Header checkbox chọn tất cả trang hiện tại (có indeterminate state).
@@ -142,7 +142,7 @@ Header checkbox chọn tất cả trang hiện tại (có indeterminate state).
 ### 3.5 Radio column — chọn 1
 
 ```html
-<kendo-grid-radio-column title="Chọn 1" width="70" />
+<smart-grid-radio-column title="Chọn 1" width="70" />
 ```
 
 Chọn row mới sẽ thay thế toàn bộ selection hiện tại.
@@ -150,7 +150,7 @@ Chọn row mới sẽ thay thế toàn bộ selection hiện tại.
 ### 3.6 Command column — row edit
 
 ```html
-<kendo-grid
+<smart-grid
     [data]="products"
     (edit)="onEdit($event)"
     (save)="onSave($event)"
@@ -158,8 +158,8 @@ Chọn row mới sẽ thay thế toàn bộ selection hiện tại.
     (remove)="onRemove($event)"
 >
     <!-- ...các cột khác -->
-    <kendo-grid-command-column title="Thao tác" [width]="160" />
-</kendo-grid>
+    <smart-grid-command-column title="Thao tác" [width]="160" />
+</smart-grid>
 ```
 
 | Input | Mô tả |
@@ -178,11 +178,11 @@ Khi bấm edit → hàng đổi thành input, bấm save/cancel để kết thú
 ### Cell template
 
 ```html
-<kendo-grid-column field="UnitPrice" title="Đơn giá" width="140">
-    <ng-template kendoGridCellTemplate let-dataItem>
+<smart-grid-column field="UnitPrice" title="Đơn giá" width="140">
+    <ng-template smartGridCellTemplate let-dataItem>
         {{ dataItem.UnitPrice | number: '1.2-2' }} ₫
     </ng-template>
-</kendo-grid-column>
+</smart-grid-column>
 ```
 
 Context: `$implicit` = dataItem, `rowIndex`, `column`.
@@ -190,7 +190,7 @@ Context: `$implicit` = dataItem, `rowIndex`, `column`.
 ### Header template
 
 ```html
-<ng-template kendoGridHeaderTemplate let-column>
+<ng-template smartGridHeaderTemplate let-column>
     <span style="color:#1a73e8">{{ column.title }}</span>
 </ng-template>
 ```
@@ -198,11 +198,11 @@ Context: `$implicit` = dataItem, `rowIndex`, `column`.
 ### Footer template (grid footer / group footer)
 
 ```html
-<kendo-grid-column field="UnitPrice" title="Đơn giá" width="180">
-    <ng-template kendoGridFooterTemplate let-value>
+<smart-grid-column field="UnitPrice" title="Đơn giá" width="180">
+    <ng-template smartGridFooterTemplate let-value>
         Sum: {{ value.sum | number: '1.2-2' }} ₫
     </ng-template>
-</kendo-grid-column>
+</smart-grid-column>
 ```
 
 Context: `$implicit` = aggregate result của field, `column`, `aggregates`.
@@ -210,7 +210,7 @@ Context: `$implicit` = aggregate result của field, `column`, `aggregates`.
 ### No-records template
 
 ```html
-<ng-template kendoGridNoRecordsTemplate>
+<ng-template smartGridNoRecordsTemplate>
     <div class="empty-box">Không có dữ liệu</div>
 </ng-template>
 ```
@@ -218,11 +218,11 @@ Context: `$implicit` = aggregate result của field, `column`, `aggregates`.
 ### Detail template (master detail)
 
 ```html
-<kendo-grid [data]="products" detailExpandBy="'ProductID'">
-    <ng-template kendoGridDetailTemplate let-dataItem>
+<smart-grid [data]="products" detailExpandBy="'ProductID'">
+    <ng-template smartGridDetailTemplate let-dataItem>
         <p>Chi tiết của {{ dataItem.ProductName }}</p>
     </ng-template>
-</kendo-grid>
+</smart-grid>
 ```
 
 `detailExpandBy` giữ trạng thái expand khi đổi trang/sort.
@@ -281,7 +281,7 @@ Context: `$implicit` = aggregate result của field, `column`, `aggregates`.
 ### 6.1 Server-driven data binding
 
 ```ts
-import { GridDataResult, DataStateChangeEvent, DataBindingFetch, process } from 'emi-grid';
+import { GridDataResult, DataStateChangeEvent, DataBindingFetch, process } from 'smart-grid';
 
 fetchProducts: DataBindingFetch = (state: DataStateChangeEvent) => {
     return this.http.get<GridDataResult>('/api/products', { params: state });
@@ -290,8 +290,8 @@ fetchProducts: DataBindingFetch = (state: DataStateChangeEvent) => {
 ```
 
 ```html
-<kendo-grid [kendoGridDataBinding]="fetchProducts" [sortable]="true" [pageable]="true" [pageSize]="5">
-</kendo-grid>
+<smart-grid [smartGridDataBinding]="fetchProducts" [sortable]="true" [pageable]="true" [pageSize]="5">
+</smart-grid>
 ```
 
 Directive tự gọi lại khi user đổi sort/page/filter/group. Có `reload()` public method.
@@ -299,8 +299,8 @@ Directive tự gọi lại khi user đổi sort/page/filter/group. Có `reload()
 ### 6.2 State persistence
 
 ```html
-<kendo-grid #grid [data]="products" (stateChange)="onStateChange($event)">
-</kendo-grid>
+<smart-grid #grid [data]="products" (stateChange)="onStateChange($event)">
+</smart-grid>
 ```
 
 ```ts
@@ -332,8 +332,8 @@ Group footer tự hiển thị aggregate theo cột. Aggregate hỗ trợ: `coun
 ### 6.4 Grid footer aggregates
 
 ```html
-<kendo-grid [data]="products" [aggregates]="aggregates">
-</kendo-grid>
+<smart-grid [data]="products" [aggregates]="aggregates">
+</smart-grid>
 ```
 
 ```ts
@@ -346,7 +346,7 @@ aggregates: AggregateDescriptor[] = [
 ### 6.5 Responsive — ẩn cột theo media query
 
 ```html
-<kendo-grid-column field="UnitPrice" title="Đơn giá" width="140" media="(min-width: 600px)" />
+<smart-grid-column field="UnitPrice" title="Đơn giá" width="140" media="(min-width: 600px)" />
 ```
 
 Cột tự ẩn/hiện khi viewport thay đổi.
@@ -354,7 +354,7 @@ Cột tự ẩn/hiện khi viewport thay đổi.
 ### 6.6 autoGenerateColumns
 
 ```html
-<kendo-grid [data]="products" [autoGenerateColumns]="true"></kendo-grid>
+<smart-grid [data]="products" [autoGenerateColumns]="true"></smart-grid>
 ```
 
 Tự tạo cột theo fields của object đầu tiên trong data.
@@ -368,7 +368,7 @@ Tự tạo cột theo fields của object đầu tiên trong data.
 Grid dùng class names Kendo chuẩn (`k-grid`, `k-table`, `k-header`...) — override thoải mái:
 
 ```scss
-kendo-grid {
+smart-grid {
     --kendo-color-primary: #1a73e8;   /* màu chính (sort active, selection...) */
     --kendo-color-surface: #ffffff;   /* nền */
     border-radius: 8px;
@@ -376,23 +376,23 @@ kendo-grid {
 }
 
 /* header */
-kendo-grid .k-header {
+smart-grid .k-header {
     background: #f8f9fa;
     font-weight: 600;
 }
 
 /* cell */
-kendo-grid .k-table-td {
+smart-grid .k-table-td {
     border-bottom: 1px solid #eee;
 }
 
 /* selection */
-kendo-grid .k-selected {
+smart-grid .k-selected {
     background: rgba(26, 115, 232, 0.12);
 }
 
 /* loading mask */
-kendo-grid .k-loading-text {
+smart-grid .k-loading-text {
     color: #1a73e8;
 }
 ```
@@ -406,7 +406,7 @@ rowSelectedFn = ({ dataItem }) => dataItem.UnitPrice > 50;
 ```
 
 ```html
-<kendo-grid [data]="products" [rowClass]="rowClassFn" [rowSelected]="rowSelectedFn"></kendo-grid>
+<smart-grid [data]="products" [rowClass]="rowClassFn" [rowSelected]="rowSelectedFn"></smart-grid>
 ```
 
 ```scss
@@ -416,7 +416,7 @@ rowSelectedFn = ({ dataItem }) => dataItem.UnitPrice > 50;
 ### Kết hợp mọi thứ — ví dụ hoàn chỉnh
 
 ```html
-<kendo-grid
+<smart-grid
     [data]="products"
     [sortable]="true"
     [pageable]="true"
@@ -435,23 +435,23 @@ rowSelectedFn = ({ dataItem }) => dataItem.UnitPrice > 50;
     (selectionChange)="onSelection($event)"
     (dataStateChange)="onStateChange($event)"
 >
-    <kendo-grid-checkbox-column title="Chọn" width="50" />
-    <kendo-grid-column field="ProductID" title="ID" width="70" [locked]="true" />
-    <kendo-grid-column field="ProductName" title="Tên" width="220">
-        <ng-template kendoGridCellTemplate let-dataItem>
+    <smart-grid-checkbox-column title="Chọn" width="50" />
+    <smart-grid-column field="ProductID" title="ID" width="70" [locked]="true" />
+    <smart-grid-column field="ProductName" title="Tên" width="220">
+        <ng-template smartGridCellTemplate let-dataItem>
             <strong>{{ dataItem.ProductName }}</strong>
         </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="UnitPrice" title="Đơn giá" width="140" [footerStyle]="{ 'font-weight': '700' }">
-        <ng-template kendoGridCellTemplate let-dataItem>
+    </smart-grid-column>
+    <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" [footerStyle]="{ 'font-weight': '700' }">
+        <ng-template smartGridCellTemplate let-dataItem>
             {{ dataItem.UnitPrice | number: '1.2-2' }} ₫
         </ng-template>
-        <ng-template kendoGridFooterTemplate let-value>
+        <ng-template smartGridFooterTemplate let-value>
             Tổng: {{ value.sum | number: '1.2-2' }} ₫
         </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-command-column title="Thao tác" [width]="150" />
-</kendo-grid>
+    </smart-grid-column>
+    <smart-grid-command-column title="Thao tác" [width]="150" />
+</smart-grid>
 ```
 
 ---
@@ -459,8 +459,8 @@ rowSelectedFn = ({ dataItem }) => dataItem.UnitPrice > 50;
 ## 8. Build & test thư viện
 
 ```bash
-npx ng build emi-grid        # build lib → dist/emi-grid
-npx ng test emi-grid --watch=false --browsers=ChromeHeadless   # 81 tests
+npx ng build smart-grid        # build lib → dist/smart-grid
+npx ng test smart-grid --watch=false --browsers=ChromeHeadless   # 81 tests
 npx ng serve demo            # demo local
 ```
 

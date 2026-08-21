@@ -1,4 +1,4 @@
-# emi-grid — Kendo Grid API-Compatible Clone for Angular 20+
+# smart-grid — Kendo Grid API-Compatible Clone for Angular 20+
 
 > **Trạng thái**: **v1.0 CORE SHIPPED** ✅ — grid + column + templates + sort + pager + loading/hideHeader/no-records + client-server data; query layer match 100% `kendo-data-query` 1.6.0; **52/52 tests PASS**; demo runtime verified (headless Chrome)
 > Nguồn: `node_modules/@progress/kendo-angular-grid/dist/es2015/*.d.ts` (đã verify từng selector/input/output)
@@ -208,7 +208,7 @@ enum FilterOperator { Contains='contains', DoesNotContain='doesnotcontain', Does
 ## 7. Kiến trúc Angular 20 (đề xuất)
 
 ```
-projects/emi-grid/src/lib/
+projects/smart-grid/src/lib/
 ├── grid.component.ts          → selector kendo-grid, standalone, signals
 ├── grid.module.ts (optional)  → provide exports cho compat
 ├── column/
@@ -270,9 +270,9 @@ projects/emi-grid/src/lib/
    - Click pager Next → `pageChange { skip: 3, take: 3 }`, page 2 hiển thị, info cập nhật
    - Empty data → no-records row
    - Tổng **52/52 tests PASS** (45 unit + 7 component). ⚠️ Test infra: library phải khai báo `polyfills: ["zone.js", "zone.js/testing"]` trong `angular.json` test target mới chạy được (Angular 20 default zoneless, TestBed cần zone.js)
-3. **Demo app runtime** ✅ — `projects/demo` (12 records Northwind, 5 cột: ID, Tên sản phẩm + cell template + header template + badge "ngừng", Đơn giá DecimalPipe + headerStyle right, Danh mục, Trạng thái conditional; pageSize 5; sortable + pageable + loading toggle; bắt `sortChange`/`pageChange`/`dataStateChange` log ra `lastEvent`). `ng build demo` PASS; chạy `ng serve` → **headless Chrome dump DOM**: render đủ 5 cột / 5 rows / cell template (Đang bán) / DecimalPipe (18.00 ₫) / pager "Page 1 of 3 (12 records)" / `k-header-sort` trên cả 5 th. (Screenshot PNG đã chụp — xem `/tmp/emi-grid-demo.png`)
+3. **Demo app runtime** ✅ — `projects/demo` (12 records Northwind, 5 cột: ID, Tên sản phẩm + cell template + header template + badge "ngừng", Đơn giá DecimalPipe + headerStyle right, Danh mục, Trạng thái conditional; pageSize 5; sortable + pageable + loading toggle; bắt `sortChange`/`pageChange`/`dataStateChange` log ra `lastEvent`). `ng build demo` PASS; chạy `ng serve` → **headless Chrome dump DOM**: render đủ 5 cột / 5 rows / cell template (Đang bán) / DecimalPipe (18.00 ₫) / pager "Page 1 of 3 (12 records)" / `k-header-sort` trên cả 5 th. (Screenshot PNG đã chụp — xem `/tmp/smart-grid-demo.png`)
 
 ## 10. Nguồn & Ghi chú pháp lý
 - API contract trích xuất từ `.d.ts` (không phải source JS) — clean-room scope: chỉ dùng contract, tự viết implementation
 - Không đưa code JS của Kendo vào repo
-- `kendo-theme-default` có thể dùng nếu không có commercial license (Apache 2.0 fallback) — hoặc tự viết theme riêng mang tên emi-grid
+- `kendo-theme-default` có thể dùng nếu không có commercial license (Apache 2.0 fallback) — hoặc tự viết theme riêng mang tên smart-grid
