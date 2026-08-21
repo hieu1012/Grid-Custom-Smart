@@ -365,27 +365,29 @@
 
 /* ── Playground CSS Custom Properties → Grid Styling ── */
 .playground-preview .my-grid.k-grid {
-  border-color: var(--pg-border-color, #dee2e6);
-  border-width: var(--pg-border-width, 1px);
-  border-style: var(--pg-border-style, solid);
-  border-radius: var(--pg-border-radius, 0px);
+  border-color: var(--pg-border-color, #dee2e6) !important;
+  border-width: var(--pg-border-width, 1px) !important;
+  border-style: var(--pg-border-style, solid) !important;
+  border-radius: var(--pg-border-radius, 0px) !important;
 }
 
-.playground-preview .my-grid .k-table-th {
-  background: var(--pg-header-bg, #f8f9fa);
-  color: var(--pg-header-text, #1a1a2e);
-  border-color: var(--pg-header-border, #dee2e6);
-  padding: var(--pg-header-padding, 10px 12px);
-  font-weight: var(--pg-header-font-weight, 600);
-  text-align: var(--pg-alignment, left);
+.playground-preview .my-grid .k-table th,
+.playground-preview .my-grid .k-table-thead .k-table-th {
+  background: var(--pg-header-bg, #f8f9fa) !important;
+  color: var(--pg-header-text, #1a1a2e) !important;
+  border-color: var(--pg-header-border, #dee2e6) !important;
+  padding: var(--pg-header-padding, 10px 12px) !important;
+  font-weight: var(--pg-header-font-weight, 600) !important;
+  text-align: var(--pg-alignment, left) !important;
 }
 
-.playground-preview .my-grid .k-table-td {
-  background: var(--pg-cell-bg, #ffffff);
-  color: var(--pg-cell-text, #212529);
-  border-color: var(--pg-cell-border, #dee2e6);
-  padding: var(--pg-cell-padding, 8px 12px);
-  text-align: var(--pg-alignment, left);
+.playground-preview .my-grid .k-table td,
+.playground-preview .my-grid .k-table-tbody .k-table-td {
+  background: var(--pg-cell-bg, #ffffff) !important;
+  color: var(--pg-cell-text, #212529) !important;
+  border-color: var(--pg-cell-border, #dee2e6) !important;
+  padding: var(--pg-cell-padding, 8px 12px) !important;
+  text-align: var(--pg-alignment, left) !important;
 }
 
 /* ── Toolbar ── */
