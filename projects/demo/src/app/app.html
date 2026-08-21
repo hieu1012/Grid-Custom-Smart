@@ -206,8 +206,22 @@
                         <label><input type="checkbox" [checked]="playground().hoverHighlight" (change)="updatePlayground('hoverHighlight', $any($event.target).checked)"> Hover highlight</label>
                     </div>
                 </div>
-                <div class="playground-preview" [style]="playgroundCss">
-                    <smart-grid class="my-grid" [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300">
+                <div class="playground-preview">
+                    <smart-grid class="my-grid" [data]="products()" [sortable]="true" [pageable]="true" [pageSize]="5" [height]="300"
+                        [style.--pg-header-bg]="playground().headerBg"
+                        [style.--pg-header-text]="playground().headerText"
+                        [style.--pg-header-border]="playground().headerBorder"
+                        [style.--pg-header-padding]="playground().headerPadding"
+                        [style.--pg-header-font-weight]="playground().headerFontWeight"
+                        [style.--pg-cell-bg]="playground().cellBg"
+                        [style.--pg-cell-text]="playground().cellText"
+                        [style.--pg-cell-border]="playground().cellBorder"
+                        [style.--pg-cell-padding]="playground().cellPadding"
+                        [style.--pg-border-color]="playground().borderColor"
+                        [style.--pg-border-width]="playground().borderWidth"
+                        [style.--pg-border-style]="playground().borderStyle"
+                        [style.--pg-border-radius]="playground().borderRadius"
+                        [style.--pg-alignment]="playground().alignment">
                         <smart-grid-column field="ProductID" title="ID" width="70" />
                         <smart-grid-column field="ProductName" title="Tên sản phẩm" width="260" />
                         <smart-grid-column field="UnitPrice" title="Đơn giá" width="140" />
